@@ -49,8 +49,8 @@ ENV CHROME_DRIVER=/usr/local/bin/chromedriver
 # Copy the entire project into the container
 COPY . .
 
-# Expose the port that Streamlit will use
-EXPOSE 8000
+# Expose the port that FastAPI will use (default 8080)
+EXPOSE 8080
 
 # Clean up any unnecessary packages after installation
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -58,6 +58,5 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 # Ensure all packages are updated to their latest versions
 RUN apt-get update && apt-get dist-upgrade -y 
 
-
-# Command to run the Streamlit app
+# Command to run the FastAPI app with Uvicorn
 CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8080"]
