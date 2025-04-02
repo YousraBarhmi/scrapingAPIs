@@ -60,10 +60,15 @@ def setup_selenium(attended_mode=False):
         for option in HEADLESS_OPTIONS:
             options.add_argument(option)
     options.add_argument(f"user-agent={random.choice(USER_AGENTS)}")
+    options.binary_location = "/usr/bin/google-chrome"
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    # options.add_argument("--disable-gpu")
 
     # Initialize the WebDriver
     driver = webdriver.Chrome(service=service, options=options)
     return driver
+
 
 def fetch_html_selenium(url, attended_mode=False, driver=None):
     if driver is None:
