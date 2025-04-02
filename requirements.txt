@@ -16,4 +16,3 @@ openpyxl
 groq
 google-generativeai
 webdriver-manager
-flask 

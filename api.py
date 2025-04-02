@@ -116,8 +116,3 @@ def scrape_data(request: ScrapeRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# ---------------------- Run the API ----------------------
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app)
