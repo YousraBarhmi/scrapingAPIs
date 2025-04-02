@@ -33,7 +33,9 @@ load_dotenv()
 
 
 # Set up the Chrome WebDriver options
-
+import shutil
+print("Chrome path:", shutil.which("google-chrome"))
+print("Chromedriver path:", shutil.which("chromedriver"))
 
 def is_running_in_docker():
     """
@@ -61,8 +63,11 @@ def setup_selenium(attended_mode=False):
             options.add_argument(option)
     options.add_argument(f"user-agent={random.choice(USER_AGENTS)}")
     options.binary_location = "/usr/bin/google-chrome"
+    options.add_argument("--headless")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--remote-debugging-port=9222")
+
     # options.add_argument("--disable-gpu")
 
     # Initialize the WebDriver

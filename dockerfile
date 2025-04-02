@@ -1,38 +1,57 @@
-# Utiliser une image Python comme base
-FROM python:3.10-slim
+# Base image with Python 3.11.4
+FROM python:3.11.4-slim
 
-# Installer les dépendances système nécessaires
-RUN apt-get update && apt-get install -y \
-    wget \
-    curl \
-    unzip \
-    gnupg \
-    && rm -rf /var/lib/apt/lists/*
-
-# Installer Google Chrome
-RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - \
-    && echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list \
-    && apt-get update && apt-get install -y google-chrome-stable \
-    && rm -rf /var/lib/apt/lists/*
-
-# Installer ChromeDriver (assure-toi que la version correspond à celle de Chrome installé)
-RUN CHROME_VERSION=$(google-chrome --version | awk '{print $3}' | cut -d '.' -f 1) \
-    && wget -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/${CHROME_VERSION}.0.0/chromedriver_linux64.zip \
-    && unzip /tmp/chromedriver.zip -d /usr/local/bin/ \
-    && rm /tmp/chromedriver.zip \
-    && chmod +x /usr/local/bin/chromedriver
-
-# Définir le répertoire de travail
+# Set the working directory in the container
 WORKDIR /app
 
-# Copier les fichiers de l'application
-COPY . .
-
-# Installer les dépendances Python
+# Copy the requirements file and install dependencies
+COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Exposer le port si nécessaire (par exemple pour une API Flask)
-EXPOSE 5000
+# Install Chrome Browser and additional dependencies
+RUN apt-get update && apt-get install -y \
+    wget \
+    gnupg \
+    unzip \
+    libappindicator3-1 \
+    libasound2 \
+    libatk-bridge2.0-0 \
+    libatk1.0-0 \
+    libcups2 \
+    libdrm2 \
+    libgbm1 \
+    libnspr4 \
+    libnss3 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxrandr2 \
+    fonts-liberation \
+    xdg-utils \
+    --no-install-recommends && \
+    wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - && \
+    sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list' && \
+    apt-get update && apt-get install -y google-chrome-stable && \
+    rm -rf /var/lib/apt/lists/*
 
-# Lancer l'application
-CMD ["python", "api.py"]
+# Install WebDriver Manager to manage ChromeDriver
+RUN pip install webdriver-manager
+
+# Set environment variables for Chrome in headless mode
+ENV CHROME_BIN=/usr/bin/google-chrome
+ENV CHROME_DRIVER=/usr/local/bin/chromedriver
+
+# Copy the entire project into the container
+COPY . .
+
+# Expose the port that Streamlit will use
+EXPOSE 8000
+
+# Clean up any unnecessary packages after installation
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Ensure all packages are updated to their latest versions
+RUN apt-get update && apt-get dist-upgrade -y 
+
+
+# Command to run the Streamlit app
+CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8000"]

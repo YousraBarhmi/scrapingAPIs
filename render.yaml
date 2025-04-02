@@ -1,7 +1,0 @@
-services:
-  - type: web
-    name: selenium-scraper
-    runtime: docker 
-    plan: free
-    buildCommand: docker build -t scraper .
-    startCommand: docker run scraper
