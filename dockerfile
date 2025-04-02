@@ -33,8 +33,14 @@ RUN apt-get update && apt-get install -y \
     apt-get update && apt-get install -y google-chrome-stable && \
     rm -rf /var/lib/apt/lists/*
 
-# Install WebDriver Manager to manage ChromeDriver
-RUN pip install webdriver-manager
+# Install WebDriver Manager and Chromedriver
+RUN apt-get update && apt-get install -y \
+    wget unzip curl && \
+    CHROMEDRIVER_VERSION=$(curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE) && \
+    wget -N https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip -P /tmp/ && \
+    unzip /tmp/chromedriver_linux64.zip -d /usr/local/bin/ && \
+    rm /tmp/chromedriver_linux64.zip && \
+    chmod +x /usr/local/bin/chromedriver
 
 # Set environment variables for Chrome in headless mode
 ENV CHROME_BIN=/usr/bin/google-chrome

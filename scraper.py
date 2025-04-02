@@ -37,42 +37,50 @@ import shutil
 print("Chrome path:", shutil.which("google-chrome"))
 print("Chromedriver path:", shutil.which("chromedriver"))
 
+
 def is_running_in_docker():
-    """
-    Detect if the app is running inside a Docker container.
-    This checks if the '/proc/1/cgroup' file contains 'docker'.
-    """
-    try:
-        with open("/proc/1/cgroup", "rt") as file:
-            return "docker" in file.read()
-    except Exception:
-        return False
+    return os.path.exists("/.dockerenv") or os.getenv("DOCKER") == "true"
 
 def setup_selenium(attended_mode=False):
     options = Options()
-    service = Service(ChromeDriverManager().install())
 
-    # Apply headless options based on whether the code is running in Docker
-    if is_running_in_docker():
-        # Running inside Docker, use Docker-specific headless options
-        for option in HEADLESS_OPTIONS_DOCKER:
-            options.add_argument(option)
-    else:
-        # Not running inside Docker, use the normal headless options
-        for option in HEADLESS_OPTIONS:
-            options.add_argument(option)
-    options.add_argument(f"user-agent={random.choice(USER_AGENTS)}")
+    # Use Docker-specific headless options
+    for option in HEADLESS_OPTIONS_DOCKER:
+        options.add_argument(option)
+
+    # Set correct Chrome binary and Chromedriver path
     options.binary_location = "/usr/bin/google-chrome"
-    options.add_argument("--headless")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("--remote-debugging-port=9222")
+    service = Service("/usr/local/bin/chromedriver")  # Explicitly set Chromedriver path
 
-    # options.add_argument("--disable-gpu")
-
-    # Initialize the WebDriver
+    # Initialize WebDriver
     driver = webdriver.Chrome(service=service, options=options)
     return driver
+
+# def setup_selenium(attended_mode=False):
+#     options = Options()
+#     service = Service(ChromeDriverManager().install())
+
+#     # Apply headless options based on whether the code is running in Docker
+#     if is_running_in_docker():
+#         # Running inside Docker, use Docker-specific headless options
+#         for option in HEADLESS_OPTIONS_DOCKER:
+#             options.add_argument(option)
+#     else:
+#         # Not running inside Docker, use the normal headless options
+#         for option in HEADLESS_OPTIONS:
+#             options.add_argument(option)
+#     options.add_argument(f"user-agent={random.choice(USER_AGENTS)}")
+#     options.binary_location = "/usr/bin/google-chrome"
+#     options.add_argument("--headless")
+#     options.add_argument("--no-sandbox")
+#     options.add_argument("--disable-dev-shm-usage")
+#     options.add_argument("--remote-debugging-port=9222")
+
+#     # options.add_argument("--disable-gpu")
+
+#     # Initialize the WebDriver
+#     driver = webdriver.Chrome(service=service, options=options)
+#     return driver
 
 
 def fetch_html_selenium(url, attended_mode=False, driver=None):
