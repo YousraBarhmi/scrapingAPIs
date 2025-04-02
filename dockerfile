@@ -33,18 +33,25 @@ RUN apt-get update && apt-get install -y \
     apt-get update && apt-get install -y google-chrome-stable && \
     rm -rf /var/lib/apt/lists/*
 
-# Install WebDriver Manager and Chromedriver
+# Install additional dependencies needed for Chrome to run headless
 RUN apt-get update && apt-get install -y \
-    wget unzip curl && \
-    CHROMEDRIVER_VERSION=$(curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE) && \
-    wget -N https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip -P /tmp/ && \
-    unzip /tmp/chromedriver_linux64.zip -d /usr/local/bin/ && \
-    rm /tmp/chromedriver_linux64.zip && \
-    chmod +x /usr/local/bin/chromedriver
+    libx11-xcb1 \
+    libxcomposite1 \
+    libxrandr2 \
+    libgdk-pixbuf2.0-0 \
+    libpangocairo-1.0-0 \
+    libatk-bridge2.0-0 \
+    libatk1.0-0 \
+    libcups2 \
+    libdrm2 \
+    libnss3 \
+    libnspr4 \
+    fonts-liberation \
+    xdg-utils \
+    --no-install-recommends
 
 # Set environment variables for Chrome in headless mode
-ENV CHROME_BIN=/usr/bin/google-chrome
-ENV CHROME_DRIVER=/usr/local/bin/chromedriver
+ENV CHROME_BIN=/usr/bin/google-chrome-stable
 
 # Copy the entire project into the container
 COPY . .
@@ -56,7 +63,7 @@ EXPOSE 8080
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Ensure all packages are updated to their latest versions
-RUN apt-get update && apt-get dist-upgrade -y 
+RUN apt-get update && apt-get dist-upgrade -y
 
 # Command to run the FastAPI app with Uvicorn
 CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8080"]
