@@ -1,0 +1,109 @@
+{
+    "evaluation_criteria": {
+      "structure_navigation": {
+        "menus_clairs": {
+          "description": "Le menu est clair et compréhensible",
+          "score": 5,
+          "penalty": -5,
+          "evaluation_method": "Vérifier la présence de <nav>, <ul>, <li> et compter les éléments"
+        },
+        "parcours_utilisateur_fluide": {
+          "description": "L’utilisateur peut accomplir une tâche en 2-3 clics",
+          "score": 5,
+          "penalty": -5,
+          "evaluation_method": "Vérifier le nombre de liens internes et le maillage des pages"
+        }
+      },
+      "contenu": {
+        "proposition_valeur_claire": {
+          "description": "Le site explique clairement son objectif",
+          "score": 10,
+          "penalty": -10,
+          "evaluation_method": "Vérifier si <h1> contient un message clair"
+        },
+        "absence_jargon": {
+          "description": "Le site évite le jargon inutile",
+          "score": 5,
+          "penalty": -5,
+          "evaluation_method": "Analyse sémantique du texte"
+        },
+        "titres_optimises": {
+          "description": "Les titres sont précis et explicites",
+          "score": 5,
+          "penalty": -3,
+          "evaluation_method": "Vérifier la présence et la clarté des balises <h1>, <h2>, <h3>"
+        },
+        "cta_clairs": {
+          "description": "Les CTA sont actionnables et explicites",
+          "score": 5,
+          "penalty": -3,
+          "evaluation_method": "Vérifier la présence de boutons <button> et <a class='btn'>"
+        }
+      },
+      "ux": {
+        "boutons_visibles_coherents": {
+          "description": "Les boutons sont bien visibles et uniformes",
+          "score": 5,
+          "penalty": -3,
+          "evaluation_method": "Vérifier la présence de <button> et <a class='btn'>"
+        },
+        "formulaires_simples": {
+          "description": "Les formulaires ne dépassent pas 3-4 champs",
+          "score": 5,
+          "penalty": -3,
+          "evaluation_method": "Vérifier le nombre de <input> dans <form>"
+        }
+      },
+      "design": {
+        "hiérarchie_visuelle": {
+          "description": "Les titres, sous-titres et paragraphes sont bien structurés",
+          "score": 5,
+          "penalty": -3,
+          "evaluation_method": "Vérifier la présence et la structure des balises <h1>, <h2>, <p>"
+        }
+      },
+      "seo_technique": {
+        "urls_propres": {
+          "description": "Les URLs sont lisibles et optimisées",
+          "score": 5,
+          "penalty": -3,
+          "evaluation_method": "Vérifier si les URLs contiennent des mots-clés et sont lisibles"
+        },
+        "balises_title_meta": {
+          "description": "Les balises <title> et meta description sont présentes et uniques",
+          "score": 10,
+          "penalty": -10,
+          "evaluation_method": "Vérifier si <title> et <meta name='description'> existent et sont uniques"
+        },
+        "hierarchie_hn": {
+          "description": "La structure H1, H2, H3 est correcte",
+          "score": 5,
+          "penalty": -5,
+          "evaluation_method": "Vérifier si <h1> est unique et suivi de <h2>, <h3>"
+        }
+      },
+      "maillage_liens": {
+        "liens_internes_optimises": {
+          "description": "Les pages sont bien reliées entre elles via des liens internes",
+          "score": 5,
+          "penalty": -3,
+          "evaluation_method": "Vérifier si chaque page a plusieurs liens internes"
+        },
+        "liens_externes_tagges": {
+          "description": "Les liens externes sont bien configurés (nofollow si nécessaire)",
+          "score": 5,
+          "penalty": -3,
+          "evaluation_method": "Vérifier si les liens externes ont rel='nofollow'"
+        }
+      },
+      "accessibilite": {
+        "balises_alt_images": {
+          "description": "Toutes les images ont des balises alt descriptives",
+          "score": 5,
+          "penalty": -5,
+          "evaluation_method": "Vérifier si chaque <img> a un attribut alt"
+        }
+      }
+    }
+  }
+  
