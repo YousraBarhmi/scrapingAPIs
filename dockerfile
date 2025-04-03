@@ -40,7 +40,7 @@ WORKDIR /app
 COPY . .
 
 # Install Python dependencies directly (no venv!)
-RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip && pip install -r requirements.txt
 
 # Expose port
 EXPOSE 8000
