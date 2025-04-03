@@ -3,7 +3,6 @@ FROM python:3.11-slim
 
 # 2. Install system dependencies for Chrome & Selenium
 RUN apt-get update && apt-get install -y \
-    python3-distutils \
     wget curl gnupg unzip \
     libglib2.0-0 \
     libnss3 \
@@ -25,6 +24,9 @@ RUN apt-get update && apt-get install -y \
     fonts-liberation \
     xdg-utils \
     && rm -rf /var/lib/apt/lists/*
+    
+RUN apt-get update && apt-get install -y python3-distutils
+
 
 RUN apt-get update && apt-get install -y \
     chromium=114.0.5735.90-1~deb11u1 \

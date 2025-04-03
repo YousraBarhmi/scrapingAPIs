@@ -50,9 +50,7 @@ def setup_selenium(attended_mode=False):
     # Optional: detect if in Docker
     if is_running_in_docker():
         options.binary_location = "/usr/bin/chromium"
-
-    # 💡 Use webdriver-manager to auto-resolve correct driver version
-    service = Service(ChromeDriverManager().install())
+    service = Service("/usr/bin/chromedriver")
 
     driver = webdriver.Chrome(service=service, options=options)
     return driver
