@@ -20,7 +20,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.chrome import ChromeDriverManager
 
 
 from openai import OpenAI
@@ -41,24 +40,17 @@ def is_running_in_docker():
     return os.path.exists("/.dockerenv") or os.getenv("DOCKER") == "true"
 
 def setup_selenium(attended_mode=False):
-    print("Chrome path:", shutil.which("google-chrome"))
-    print("Chromedriver path:", shutil.which("chromedriver"))
-    chrome_path = shutil.which("chromium") or "/usr/bin/chromium"
-    driver_path = shutil.which("chromedriver") or "/usr/bin/chromedriver"
-    print("Chrome path:", chrome_path)
-    print("Chromedriver path:", driver_path)
+    import shutil
+    print("DEBUG >> CHROME:", shutil.which("chromium"))
+    print("DEBUG >> CHROMEDRIVER:", shutil.which("chromedriver"))
     options = Options()
-    # service = Service(ChromeDriverManager().install())
+    for opt in HEADLESS_OPTIONS_DOCKER:
+        options.add_argument(opt)
 
-    for option in HEADLESS_OPTIONS_DOCKER:
-        options.add_argument(option)
+    # Explicitly set binary paths
+    options.binary_location = "/usr/bin/chromium"
+    service = Service(executable_path="/usr/bin/chromedriver")
 
-    # Ensure Chrome is available in the correct location
-    options.binary_location = chrome_path
-
-    # Initialize the WebDriver
-    service = Service(driver_path)
-    
     driver = webdriver.Chrome(service=service, options=options)
     return driver
 
