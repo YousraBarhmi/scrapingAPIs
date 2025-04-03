@@ -41,19 +41,27 @@ import shutil
 def is_running_in_docker():
     return os.path.exists("/.dockerenv") or os.getenv("DOCKER") == "true"
 
+
 def setup_selenium(attended_mode=False):
+    import subprocess
+    print("🔍 Chromium Version:", subprocess.getoutput("chromium --version"))
 
     options = Options()
     for opt in HEADLESS_OPTIONS_DOCKER:
         options.add_argument(opt)
 
-    # Optional: detect if in Docker
     if is_running_in_docker():
         options.binary_location = "/usr/bin/chromium"
-    service = Service("/usr/bin/chromedriver")
 
-    driver = webdriver.Chrome(service=service, options=options)
-    return driver
+    # Let webdriver-manager find the right ChromeDriver automatically
+    service = Service(ChromeDriverManager().install())
+
+    try:
+        driver = webdriver.Chrome(service=service, options=options)
+        return driver
+    except Exception as e:
+        print("❌ WebDriver launch failed:", e)
+        raise
 
 def fetch_html_selenium(url, attended_mode=False, driver=None):
     if driver is None:
