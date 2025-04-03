@@ -8,50 +8,23 @@ WORKDIR /app
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Install Chrome Browser and additional dependencies
+# Install required dependencies
 RUN apt-get update && apt-get install -y \
-    wget \
-    gnupg \
-    unzip \
-    libappindicator3-1 \
-    libasound2 \
-    libatk-bridge2.0-0 \
-    libatk1.0-0 \
-    libcups2 \
-    libdrm2 \
-    libgbm1 \
-    libnspr4 \
-    libnss3 \
-    libxcomposite1 \
-    libxdamage1 \
-    libxrandr2 \
-    fonts-liberation \
-    xdg-utils \
-    --no-install-recommends && \
-    wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - && \
-    sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list' && \
-    apt-get update && apt-get install -y google-chrome-stable && \
-    rm -rf /var/lib/apt/lists/*
+    gconf-service libasound2 libatk1.0-0 libcairo2 libcups2 libfontconfig1 \
+    libgdk-pixbuf2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libxss1 fonts-liberation \
+    libnss3 lsb-release xdg-utils libgbm1 libxshmfence1 \
+    wget unzip curl
 
-# Install additional dependencies needed for Chrome to run headless
-RUN apt-get update && apt-get install -y \
-    libx11-xcb1 \
-    libxcomposite1 \
-    libxrandr2 \
-    libgdk-pixbuf2.0-0 \
-    libpangocairo-1.0-0 \
-    libatk-bridge2.0-0 \
-    libatk1.0-0 \
-    libcups2 \
-    libdrm2 \
-    libnss3 \
-    libnspr4 \
-    fonts-liberation \
-    xdg-utils \
-    --no-install-recommends
+# Install Chromium Browser instead of Google Chrome
+RUN apt-get install -y chromium chromium-driver
 
-# Set environment variables for Chrome in headless mode
-ENV CHROME_BIN=/usr/bin/google-chrome-stable
+# Set environment variables for Chrome and Chromedriver
+ENV CHROME_BIN=/usr/bin/chromium
+ENV CHROME_DRIVER=/usr/bin/chromedriver
+
+# Verify installations
+RUN echo "Chromium version: $(chromium --version)" && \
+    echo "Chromedriver version: $(chromedriver --version)"
 
 # Copy the entire project into the container
 COPY . .
@@ -63,7 +36,7 @@ EXPOSE 8080
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Ensure all packages are updated to their latest versions
-RUN apt-get update && apt-get dist-upgrade -y
+RUN apt-get update && apt-get dist-upgrade -y 
 
 # Command to run the FastAPI app with Uvicorn
 CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8080"]

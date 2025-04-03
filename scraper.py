@@ -34,24 +34,31 @@ load_dotenv()
 
 # Set up the Chrome WebDriver options
 import shutil
-print("Chrome path:", shutil.which("google-chrome"))
-print("Chromedriver path:", shutil.which("chromedriver"))
+
 
 
 def is_running_in_docker():
     return os.path.exists("/.dockerenv") or os.getenv("DOCKER") == "true"
 
 def setup_selenium(attended_mode=False):
+    print("Chrome path:", shutil.which("google-chrome"))
+    print("Chromedriver path:", shutil.which("chromedriver"))
+    chrome_path = shutil.which("chromium") or "/usr/bin/chromium"
+    driver_path = shutil.which("chromedriver") or "/usr/bin/chromedriver"
+    print("Chrome path:", chrome_path)
+    print("Chromedriver path:", driver_path)
     options = Options()
-    service = Service(ChromeDriverManager().install())
+    # service = Service(ChromeDriverManager().install())
 
     for option in HEADLESS_OPTIONS_DOCKER:
         options.add_argument(option)
 
     # Ensure Chrome is available in the correct location
-    options.binary_location = "/usr/bin/google-chrome"
+    options.binary_location = chrome_path
 
     # Initialize the WebDriver
+    service = Service(driver_path)
+    
     driver = webdriver.Chrome(service=service, options=options)
     return driver
 
