@@ -4,8 +4,6 @@ FROM python:3.11-slim
 # 2. Install system dependencies for Chrome & Selenium
 RUN apt-get update && apt-get install -y \
     wget curl gnupg unzip \
-    chromium \
-    chromium-driver \
     libglib2.0-0 \
     libnss3 \
     libgconf-2-4 \
@@ -26,6 +24,11 @@ RUN apt-get update && apt-get install -y \
     fonts-liberation \
     xdg-utils \
     && rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update && apt-get install -y \
+    chromium=114.0.5735.90-1~deb11u1 \
+    chromium-driver=114.0.5735.90-1~deb11u1
+
 
 # 3. Set environment vars for Chrome
 ENV CHROME_BIN="/usr/bin/chromium"
