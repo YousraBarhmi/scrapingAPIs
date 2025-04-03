@@ -1,5 +1,5 @@
 # 1. Base image with Python + dependencies
-FROM python:3.11-slim
+FROM python:3.10-slim
 
 # 2. Install system dependencies for Chrome & Selenium
 RUN apt-get update && apt-get install -y \
@@ -28,22 +28,22 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # 3. Set environment vars for Chrome
-ENV CHROME_BIN=/usr/bin/chromium \
-    CHROMEDRIVER_PATH=/usr/bin/chromedriver \
-    DOCKER=true \
-    PYTHONUNBUFFERED=1
+ENV CHROME_BIN="/usr/bin/chromium"
+ENV CHROMEDRIVER_PATH="/usr/bin/chromedriver"
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV DOCKER=true
 
-# 4. Set working directory
+# 4. Définir le dossier de travail
 WORKDIR /app
+COPY . /app
 
-# 5. Copy app files
-COPY . .
+# 5. Installer les dépendances Python
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
 
-# Install Python dependencies directly (no venv!)
-RUN pip install --upgrade pip && pip install -r requirements.txt
-
-# Expose port
+# 6. Exposer le port utilisé par uvicorn
 EXPOSE 8000
 
-# Command to run FastAPI server
+# 7. Démarrer l'application FastAPI
 CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8000"]
