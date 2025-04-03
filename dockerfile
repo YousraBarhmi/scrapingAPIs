@@ -1,5 +1,5 @@
 # 1. Base image with Python + dependencies
-FROM python:3.10-slim
+FROM python:3.11-slim
 
 # 2. Install system dependencies for Chrome & Selenium
 RUN apt-get update && apt-get install -y \
