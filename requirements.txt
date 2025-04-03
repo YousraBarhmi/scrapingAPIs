@@ -8,7 +8,7 @@ requests
 beautifulsoup4
 html2text
 tiktoken
-selenium
+selenium>=4.14.0
 readability-lxml
 streamlit
 streamlit-tags

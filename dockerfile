@@ -1,54 +1,35 @@
-# Base image with Python 3.11.4
-FROM python:3.11.4-slim
+FROM python:3.10-slim
 
-# Set environment variables to make installs non-interactive
-ENV DEBIAN_FRONTEND=noninteractive
-
-# Set working directory
-WORKDIR /app
-
-# Install required system dependencies for Chromium and headless execution
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    wget \
+# 安装依赖
+RUN apt-get update && apt-get install -y \
+    chromium \
+    chromium-driver \
     curl \
     unzip \
-    gnupg \
-    gconf-service \
+    fonts-liberation \
+    libappindicator3-1 \
     libasound2 \
-    libatk1.0-0 \
-    libcairo2 \
-    libcups2 \
-    libfontconfig1 \
-    libgdk-pixbuf2.0-0 \
+    libatk-bridge2.0-0 \
     libgtk-3-0 \
     libnspr4 \
     libnss3 \
-    libpango-1.0-0 \
     libxss1 \
-    libxshmfence1 \
-    libgbm1 \
-    lsb-release \
+    libxtst6 \
     xdg-utils \
-    fonts-liberation \
-    chromium \
-    chromium-driver \
- && apt-get clean \
- && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/*
 
-# Set environment variables for Selenium
-ENV CHROME_BIN=/usr/bin/chromium
-ENV CHROMEDRIVER_PATH=/usr/bin/chromedriver
-ENV DOCKER=true
+# 设置环境变量
+ENV CHROME_BIN="/usr/bin/chromium"
+ENV CHROMEDRIVER_PATH="/usr/bin/chromedriver"
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
-# Copy requirements and install Python dependencies
-COPY requirements.txt .
-RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
+# 安装 Python 依赖
+WORKDIR /app
+COPY . /app
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
+EXPOSE 8000
 
-# Copy app source code
-COPY . .
-
-# Expose FastAPI port (default 8080)
-EXPOSE 8080
-
-# Run the FastAPI app
-CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8080"]
+# 启动命令
+CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8000"]
