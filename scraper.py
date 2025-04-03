@@ -25,6 +25,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from openai import OpenAI
 import google.generativeai as genai
 from groq import Groq
+from webdriver_manager.chrome import ChromeDriverManager
+
 
 from api_management import get_api_key
 from assets import USER_AGENTS,HEADLESS_OPTIONS,SYSTEM_MESSAGE,evaluation_message,USER_MESSAGE,LLAMA_MODEL_FULLNAME,GROQ_LLAMA_MODEL_FULLNAME,HEADLESS_OPTIONS_DOCKER, LINKS_MESSAGE
@@ -40,16 +42,17 @@ def is_running_in_docker():
     return os.path.exists("/.dockerenv") or os.getenv("DOCKER") == "true"
 
 def setup_selenium(attended_mode=False):
-    import shutil
-    print("DEBUG >> CHROME:", shutil.which("chromium"))
-    print("DEBUG >> CHROMEDRIVER:", shutil.which("chromedriver"))
+
     options = Options()
     for opt in HEADLESS_OPTIONS_DOCKER:
         options.add_argument(opt)
 
-    # Explicitly set binary paths
-    options.binary_location = "/usr/bin/chromium"
-    service = Service(executable_path="/usr/bin/chromedriver")
+    # Optional: detect if in Docker
+    if is_running_in_docker():
+        options.binary_location = "/usr/bin/chromium"
+
+    # 💡 Use webdriver-manager to auto-resolve correct driver version
+    service = Service(ChromeDriverManager().install())
 
     driver = webdriver.Chrome(service=service, options=options)
     return driver
