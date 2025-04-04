@@ -62,20 +62,28 @@ def scrape_googleSearch(request: ScrapeRequest):
         results = []
 
         for div in soup.find_all("div", class_="CA5RN"):
-            title = div.find("span", class_="VuuXrf")
-            url = div.find("cite", class_="tjvcx")
+            title_elem = div.find("span", class_="VuuXrf")
+            cite_elem = div.find("cite")
 
-            if title and url:
-                url_text = url.get_text()
+            if not title_elem or not cite_elem:
+                continue
 
-                if url_text not in seen:
-                    seen.add(url_text)
-                    results.append({
-                        "title": title.get_text(),
-                        "url": url_text
-                    })
+            # Clean up the cite URL (strip child spans and whitespace)
+            cite_span = cite_elem.find("span")
+            if cite_span:
+                cite_span.extract()  # remove span from cite
+
+            url_text = cite_elem.get_text(strip=True)
+
+            if url_text not in seen:
+                seen.add(url_text)
+                results.append({
+                    "title": title_elem.get_text(strip=True),
+                    "url": url_text
+                })
 
         return results
+
     except Exception as e:
         return {"detail": str(e)}
 
