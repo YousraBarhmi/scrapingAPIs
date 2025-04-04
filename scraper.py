@@ -186,7 +186,6 @@ def extract_data(html_content, url):
     }
 
 def evaluate(data):
-    print('Selected model: gemini-1.5-flash >>>')
 
     # Configure the Google Gemini API
     GEMINI_API_KEY = 'AIzaSyA2WbooEs3dMYVOy2PDEe27QstNsPwE62s'
@@ -194,20 +193,15 @@ def evaluate(data):
     # Configurer le client Gemini
     genai.configure(api_key=GEMINI_API_KEY)
     # genai.configure(api_key=get_api_key("GOOGLE_API_KEY"))
-    print('API Key:', GEMINI_API_KEY)
     # Initialize the model
     model = genai.GenerativeModel("gemini-1.5-flash")
-    print('Model:', model)
     # Construct the prompt
     prompt = evaluation_message + "\n" + USER_MESSAGE + data
 
     # Generate and parse the response
     try:
-        print('Prompt:')
         completion = model.generate_content(prompt)
-        print(f"Generated Response: {completion}")
         response_text = completion.candidates[0].content.parts[0].text
-        print("Response Text:", response_text)  # Log the response text before parsing
         return response_text  # Return parsed JSON response
     except Exception as e:
         print(f"Error: {e}")  # More detailed error logging

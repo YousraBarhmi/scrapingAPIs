@@ -20,7 +20,7 @@ from selenium.webdriver.chrome.options import Options
 
 from dotenv import load_dotenv
 from openai import OpenAI
-import google.generativeai as genai
+import google.generativeai as gena
 from groq import Groq
 from scraper import (
     fetch_html_selenium,
@@ -51,6 +51,7 @@ def check_env():
 async def root():
     return {"message": "Welcome to the AI Scraper API!"}
 
+
 @app.post("/scrapeSearch/")
 def scrape_googleSearch(request: ScrapeRequest):
     try:
@@ -58,46 +59,43 @@ def scrape_googleSearch(request: ScrapeRequest):
         soup = BeautifulSoup(raw_html, "html.parser")
 
         seen = set()
-        results = [
-            {"title": title.get_text(), "url": (url_text := url.get_text())}
-            for div in soup.find_all("div", class_="CA5RN")
-            if (title := div.find("span", class_="VuuXrf")) and
-               (url := div.find("cite", class_="tjvcx")) and
-               url_text not in seen and not seen.add(url_text)
-        ]
+        results = []
+
+        for div in soup.find_all("div", class_="CA5RN"):
+            title = div.find("span", class_="VuuXrf")
+            url = div.find("cite", class_="tjvcx")
+
+            if title and url:
+                url_text = url.get_text()
+
+                if url_text not in seen:
+                    seen.add(url_text)
+                    results.append({
+                        "title": title.get_text(),
+                        "url": url_text
+                    })
 
         return results
-
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))  
+        return {"detail": str(e)}
+
 
 @app.post("/scrapeLinks/")
 def scrape_links(request: ScrapeRequest):
     """Scrape a URL and return structured data."""
     try:
-        # with open('./rules.json', 'r') as file:
-        #     rules = json.load(file)
-        # print("Rules:", rules)
-        # Step 1: Fetch the page content
         url = request.url
-        print("URL:", url)
         raw_html = fetch_html_selenium(url)
-        print("raw_html:", raw_html)
         soup = BeautifulSoup(raw_html, "html.parser")
-        # Step 2: Extract links from the page
+
         base_domain = urlparse(url).netloc
         links = soup.find_all('a', href=True)
-        print("links:", links)
         internal_links = {urljoin(url, a['href']) for a in links if urlparse(urljoin(url, a['href'])).netloc == base_domain}
         internal_links = {urljoin(url, a['href']) for a in links if urlparse(urljoin(url, a['href'])).netloc == base_domain}
     
-        print("links :", internal_links )
         data = extract_links(internal_links, request.selected_model)
-        print("Data:", data)
-        # result = evaluate(data)
-        # print("Result:", result)
-        return data
         
+        return data
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -106,13 +104,9 @@ def scrape_links(request: ScrapeRequest):
 def scrape_data(request: ScrapeRequest):
     """Scrape a URL and return structured data."""
     try:
-        # with open('./rules.json', 'r') as file:
-        #     rules = json.load(file)
-        # print("Rules:", rules)
         url = request.url
         raw_html = fetch_html_selenium(url)
         data = extract_data(raw_html, url)
-        print("Data:", data)
         return {
             "data": data
         }
