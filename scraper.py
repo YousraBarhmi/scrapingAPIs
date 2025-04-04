@@ -79,15 +79,16 @@ def fetch_html_selenium(url, attended_mode=False, driver=None):
 
     try:
         if not attended_mode:
-            actions = ActionChains(driver)
-            for _ in range(3):
-                driver.execute_script("window.scrollBy(0, window.innerHeight);")
-                time.sleep(random.uniform(1.0, 1.5))
-
-            # Wait for results to show up
-            WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.CLASS_NAME, "CA5RN"))
-            )
+            # Add more realistic actions like scrolling
+            driver.execute_script("window.scrollTo(0, document.body.scrollHeight/2);")
+            time.sleep(random.uniform(1.1, 1.8))
+            driver.execute_script("window.scrollTo(0, document.body.scrollHeight/1.3);")
+            time.sleep(random.uniform(1.1, 1.8))
+            driver.execute_script("window.scrollTo(0, document.body.scrollHeight/1);")
+            time.sleep(random.uniform(1.1, 1.8))
+            driver.execute_script("window.scrollTo(0, document.body.scrollHeight/0.8);")
+            time.sleep(random.uniform(1.1, 1.8))
+        # Get the page source from the current page
         html = driver.page_source
         return html
     finally:
