@@ -39,21 +39,28 @@ import shutil
 
 
 def is_running_in_docker():
-    return os.path.exists("/.dockerenv") or os.getenv("DOCKER") == "true"
-
+    """
+    Detect if the app is running inside a Docker container.
+    This checks if the '/proc/1/cgroup' file contains 'docker'.
+    """
+    try:
+        with open("/proc/1/cgroup", "rt") as file:
+            return "docker" in file.read()
+    except Exception:
+        return False
 
 def setup_selenium(attended_mode=False):
-    import subprocess
-    print("🔍 Chromium Version:", subprocess.getoutput("chromium --version"))
-
     options = Options()
-    for opt in HEADLESS_OPTIONS_DOCKER:
-        options.add_argument(opt)
+    # service = Service(ChromeDriverManager().install())
+    for option in HEADLESS_OPTIONS_DOCKER:
+        options.add_argument(option)
+    options.binary_location = "/usr/bin/chromium"
+    service = Service(ChromeDriverManager().install())
 
-    service = Service(executable_path="/usr/bin/chromedriver")
-
+    # Initialize the WebDriver
     driver = webdriver.Chrome(service=service, options=options)
     return driver
+
 
 def fetch_html_selenium(url, attended_mode=False, driver=None):
     if driver is None:
