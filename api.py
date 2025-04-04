@@ -56,6 +56,7 @@ async def root():
 def scrape_googleSearch(request: ScrapeRequest):
     try:
         raw_html = fetch_html_selenium(request.url)
+        print("raw_html", raw_html)
         soup = BeautifulSoup(raw_html, 'html.parser')
 
         # Set to avoid duplicates
@@ -64,6 +65,7 @@ def scrape_googleSearch(request: ScrapeRequest):
 
         # Find all result blocks
         results = soup.find_all('div', class_='CA5RN')
+        print("results", results)
 
         for item in results:
             title_tag = item.find('span', class_='VuuXrf')
