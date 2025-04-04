@@ -56,10 +56,9 @@ def setup_selenium(attended_mode=False):
     for option in HEADLESS_OPTIONS_DOCKER:
         options.add_argument(option)
 
-    # 使用自定义的 chrome 可执行路径
+    options.add_argument(f"user-agent={random.choice(USER_AGENTS)}")
     options.binary_location = "/opt/chrome/chrome"
 
-    # 指定 chromedriver 路径（与 Dockerfile 一致）
     service = Service(executable_path="/usr/local/bin/chromedriver")
 
     driver = webdriver.Chrome(service=service, options=options)
