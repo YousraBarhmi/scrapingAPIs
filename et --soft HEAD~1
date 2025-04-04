@@ -1,0 +1,36 @@
+[33m7e3b4cfe[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m Fix: chnage fetch function
+[33m16f4a737[m Fix: change the headless
+[33m3feef6ad[m Fix: SEARCH function logging
+[33m38f03a55[m Fix: SEARCH function 2
+[33m6dfe05b2[m Fix: SEARCH function
+[33mcb075035[m Fix: functions
+[33mda3e72e0[m Merge branch 'main' of https://github.com/YousraBarhmi/scrapingAPIs
+[33m845898d7[m Fix: user agent
+[33mffb01714[m Rename dockerfile to Dockerfile
+[33m007091c6[m deploy fix the error
+[33md01194fa[m deploy fix the error 9
+[33md1907ac7[m deploy fix the error 7
+[33m03d7ad67[m deploy fix the error 6
+[33mbfc9a034[m deploy fix the error 6
+[33m63e36022[m fix: switch to webdriver-manager and auto-match chromedriver
+[33m976746b1[m deploy fix the error 6
+[33m11bd3080[m deploy fix the error 6
+[33m689dc5c6[m fix: correct groq version for build
+[33m8ab5195e[m deploy fix the error 5
+[33mb50e58b0[m deploy fix the error 4
+[33mf14ebcf3[m push
+[33mfdda8baf[m deploy fix the error 3
+[33mbfeee9a8[m deploy fix the error 2
+[33m0a3a71fa[m deploy fix the error
+[33mc7cee29d[m deploy
+[33m4b5f643c[m update again
+[33m21241ab3[m update scraper
+[33m8fabd960[m Railway deployment with Docker
+[33m4fd0bb1f[m the last update inshaellah it will work
+[33md6a8eb19[m update again
+[33mb7769cf4[m update in senelium function
+[33ma992a5a3[m fix webdriver in dockerfile
+[33mfbe7e2b9[m Fix Dockerfile and update start command
+[33m9d5284ea[m commit for deployement ion Railway
+[33m602f2e5d[m update  for render
+[33mb9b90e46[m first commit
