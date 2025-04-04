@@ -35,7 +35,7 @@ load_dotenv()
 
 # Set up the Chrome WebDriver options
 import shutil
-
+import subprocess
 
 
 def is_running_in_docker():
@@ -50,6 +50,8 @@ def is_running_in_docker():
         return False
 
 def setup_selenium(attended_mode=False):
+    print("🧪 DEBUG: chrome version ->", subprocess.getoutput("google-chrome --version"))
+    print("🧪 DEBUG: chromedriver version ->", subprocess.getoutput("chromedriver --version"))
     options = Options()
     for option in HEADLESS_OPTIONS_DOCKER:
         options.add_argument(option)

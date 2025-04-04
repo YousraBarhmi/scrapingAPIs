@@ -42,6 +42,11 @@ class ScrapeRequest(BaseModel):
     fields: Optional[List[str]] = None
     attended_mode: Optional[bool] = True
 # ---------------------- API Endpoints ----------------------
+@app.on_event("startup")
+def check_env():
+    import os
+    print("🚀 DOCKER ENV:", os.getenv("DOCKER"))
+
 @app.get("/")
 async def root():
     return {"message": "Welcome to the AI Scraper API!"}
