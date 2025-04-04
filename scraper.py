@@ -51,13 +51,15 @@ def is_running_in_docker():
 
 def setup_selenium(attended_mode=False):
     options = Options()
-    # service = Service(ChromeDriverManager().install())
     for option in HEADLESS_OPTIONS_DOCKER:
         options.add_argument(option)
-    options.binary_location = "/usr/bin/chromium"
-    service = Service(ChromeDriverManager().install())
 
-    # Initialize the WebDriver
+    # 使用自定义的 chrome 可执行路径
+    options.binary_location = "/opt/chrome/chrome"
+
+    # 指定 chromedriver 路径（与 Dockerfile 一致）
+    service = Service(executable_path="/usr/local/bin/chromedriver")
+
     driver = webdriver.Chrome(service=service, options=options)
     return driver
 
