@@ -1,41 +1,39 @@
 FROM python:3.11-slim
 
-# Install Chrome & dependencies
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install system packages
 RUN apt-get update && apt-get install -y \
-    chromium \
-    chromium-driver \
-    python3-distutils \
-    wget curl unzip gnupg \
-    libglib2.0-0 \
-    libnss3 \
-    libxss1 \
-    libappindicator3-1 \
-    libxcomposite1 \
-    libxcursor1 \
-    libxdamage1 \
-    libxrandr2 \
-    libgbm1 \
-    libasound2 \
-    libatk1.0-0 \
-    libatk-bridge2.0-0 \
-    libcups2 \
-    libdbus-1-3 \
-    libx11-xcb1 \
-    libgconf-2-4 \
-    libfontconfig1 \
-    fonts-liberation \
-    xdg-utils \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+    wget unzip curl gnupg ca-certificates \
+    fonts-liberation libnss3 libxss1 libappindicator3-1 \
+    libasound2 libatk-bridge2.0-0 libgtk-3-0 \
+    && rm -rf /var/lib/apt/lists/*
 
-# Set environment variables
-ENV CHROME_BIN="/usr/bin/chromium"
-ENV DOCKER=true
+# Install Chrome
+RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
+    && apt install -y ./google-chrome-stable_current_amd64.deb \
+    && rm google-chrome-stable_current_amd64.deb
 
+# Install matching ChromeDriver
+RUN wget https://chromedriver.storage.googleapis.com/122.0.6261.94/chromedriver_linux64.zip \
+    && unzip chromedriver_linux64.zip \
+    && mv chromedriver /usr/bin/chromedriver \
+    && chmod +x /usr/bin/chromedriver \
+    && rm chromedriver_linux64.zip
+
+# Set Chrome paths
+ENV CHROME_BIN=/usr/bin/google-chrome
+ENV CHROMEDRIVER_BIN=/usr/bin/chromedriver
+ENV PATH="/usr/bin:$PATH"
+
+# Set workdir
 WORKDIR /app
+
+# Copy project
 COPY . .
 
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+# Install Python deps
+RUN pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 8000
 

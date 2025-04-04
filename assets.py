@@ -98,7 +98,7 @@ TIMEOUT_SETTINGS = {
 HEADLESS_OPTIONS = ["--headless=new", "--disable-gpu", "--disable-dev-shm-usage","--window-size=1920,1080","--disable-search-engine-choice-screen","--disable-blink-features=AutomationControlled"]
 
 
-HEADLESS_OPTIONS_DOCKER = ["--headless=new","--no-sandbox","--disable-gpu", "--disable-dev-shm-usage","--disable-software-rasterizer","--disable-setuid-sandbox","--remote-debugging-port=9222","--disable-search-engine-choice-screen"]
+HEADLESS_OPTIONS_DOCKER = ["--headless=chrome","--no-sandbox","--disable-gpu", "--disable-dev-shm-usage","--disable-software-rasterizer","--disable-setuid-sandbox","--remote-debugging-port=9222","--disable-search-engine-choice-screen"]
 #in case you don't need to open the website
 ##HEADLESS_OPTIONS=HEADLESS_OPTIONS+[ "--headless=new"]
 

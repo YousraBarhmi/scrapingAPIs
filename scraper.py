@@ -24,7 +24,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 from openai import OpenAI
 import google.generativeai as genai
-from groq import Groq
+from groq.client import Groq
 from webdriver_manager.chrome import ChromeDriverManager
 
 
@@ -50,18 +50,10 @@ def setup_selenium(attended_mode=False):
     for opt in HEADLESS_OPTIONS_DOCKER:
         options.add_argument(opt)
 
-    if is_running_in_docker():
-        options.binary_location = "/usr/bin/chromium"
+    service = Service(executable_path="/usr/bin/chromedriver")
 
-    # Let webdriver-manager find the right ChromeDriver automatically
-    service = Service(ChromeDriverManager().install())
-
-    try:
-        driver = webdriver.Chrome(service=service, options=options)
-        return driver
-    except Exception as e:
-        print("❌ WebDriver launch failed:", e)
-        raise
+    driver = webdriver.Chrome(service=service, options=options)
+    return driver
 
 def fetch_html_selenium(url, attended_mode=False, driver=None):
     if driver is None:
