@@ -38,7 +38,7 @@ app = FastAPI()
 
 class ScrapeRequest(BaseModel):
     url: str
-    selected_model: str
+    selected_model: Optional[str]
     fields: Optional[List[str]] = None
     attended_mode: Optional[bool] = True
 # ---------------------- API Endpoints ----------------------
@@ -56,33 +56,34 @@ async def root():
 def scrape_googleSearch(request: ScrapeRequest):
     try:
         raw_html = fetch_html_selenium(request.url)
-        soup = BeautifulSoup(raw_html, "html.parser")
+        soup = BeautifulSoup(raw_html, 'html.parser')
 
+        # Set to avoid duplicates
         seen = set()
-        results = []
+        results_list = []
 
-        for div in soup.find_all("div", class_="CA5RN"):
-            title_elem = div.find("span", class_="VuuXrf")
-            cite_elem = div.find("cite")
+        # Find all result blocks
+        results = soup.find_all('div', class_='CA5RN')
 
-            if not title_elem or not cite_elem:
-                continue
+        for item in results:
+            title_tag = item.find('span', class_='VuuXrf')
+            cite_tag = item.find('cite')
 
-            # Clean up the cite URL (strip child spans and whitespace)
-            cite_span = cite_elem.find("span")
-            if cite_span:
-                cite_span.extract()  # remove span from cite
+            if title_tag and cite_tag:
+                title = title_tag.text.strip()
+                link = cite_tag.get_text(strip=True)
 
-            url_text = cite_elem.get_text(strip=True)
+                # Use a tuple to check for duplicates
+                if (title, link) not in seen:
+                    seen.add((title, link))
+                    results_list.append({
+                        "title": title,
+                        "link": link
+                    })
 
-            if url_text not in seen:
-                seen.add(url_text)
-                results.append({
-                    "title": title_elem.get_text(strip=True),
-                    "url": url_text
-                })
-
-        return results
+        # Output JSON
+        json_output = json.dumps(results_list, indent=2, ensure_ascii=False)
+        print(json_output)
 
     except Exception as e:
         return {"detail": str(e)}
