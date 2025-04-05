@@ -128,11 +128,15 @@ def scrape_data(request: ScrapeRequest):
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from scraper import fetch_html_selenium, extract_data
 
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from scraper import fetch_html_selenium, extract_data
+
 @app.post("/scrapeMultiple/")
 def scrape_multiple_data(request: MultiScrapeRequest):
-    """Scrape multiple URLs in parallel and return structured data for each."""
+    """Scrape multiple URLs concurrently using headless Selenium."""
     results = []
-    MAX_WORKERS = min(5, len(request.urls))
+
+    MAX_WORKERS = min(3, len(request.urls)) 
 
     def scrape_url(url):
         try:
@@ -143,9 +147,12 @@ def scrape_multiple_data(request: MultiScrapeRequest):
             return {"url": url, "error": str(e)}
 
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-        futures = {executor.submit(scrape_url, url): url for url in request.urls}
+        future_to_url = {
+            executor.submit(scrape_url, url): url for url in request.urls
+        }
 
-        for future in as_completed(futures):
-            results.append(future.result())
+        for future in as_completed(future_to_url):
+            result = future.result()
+            results.append(result)
 
     return {"results": results}
