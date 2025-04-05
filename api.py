@@ -136,7 +136,7 @@ def scrape_multiple_data(request: MultiScrapeRequest):
     """Scrape multiple URLs concurrently using headless Selenium."""
     results = []
 
-    MAX_WORKERS = min(3, len(request.urls)) 
+    MAX_WORKERS = min(2, len(request.urls)) 
 
     def scrape_url(url):
         try:
