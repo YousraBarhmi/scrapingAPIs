@@ -95,20 +95,47 @@ def fetch_html_selenium(url, attended_mode=False, driver=None):
         if should_quit:
             driver.quit()
 
-def extract_links(data, selected_model):
-    user_prompt = f"{USER_MESSAGE} {data}"
+def extract_internal_links_from_html(raw_html, url):
+    soup = BeautifulSoup(raw_html, "html.parser")
+
+    base_domain = urlparse(url).netloc
+    normalized_url = url.rstrip('/')
+
+    links = soup.find_all('a', href=True)
     
-    # API configuration and call based on selected model
+    internal_links = {
+        urljoin(url, a['href']).rstrip('/')
+        for a in links
+        if urlparse(urljoin(url, a['href'])).netloc == base_domain
+        and urljoin(url, a['href']).rstrip('/') != normalized_url
+    }
+
+    return internal_links
+
+def extract_links(links: List[str], selected_model: str) -> List[str]:
+    user_prompt = f"{USER_MESSAGE} {json.dumps(links, ensure_ascii=False)}"
+
+    def parse_response(content):
+        try:
+            parsed = json.loads(content)
+            if isinstance(parsed, list):
+                return parsed
+            else:
+                raise ValueError("Parsed content is not a list.")
+        except json.JSONDecodeError:
+            raise ValueError("Model response is not valid JSON.")
+
     if selected_model in ["gpt-4o-mini", "gpt-4o-2024-08-06"]:
         client = OpenAI(api_key=get_api_key("OPENAI_API_KEY"))
-        response_content = client.chat.completions.create(
+        response = client.chat.completions.create(
             model=selected_model,
-            messages=[{"role": "system", "content": LINKS_MESSAGE}, {"role": "user", "content": user_prompt}]
-        ).choices[0].message.content
-        try:
-            return json.loads(response_content)
-        except json.JSONDecodeError as e:
-            raise ValueError(f"Failed to parse OpenAI response as JSON: {e}")
+            messages=[
+                {"role": "system", "content": LINKS_MESSAGE},
+                {"role": "user", "content": user_prompt}
+            ]
+        )
+        content = response.choices[0].message.content
+        return parse_response(content)
 
     elif selected_model == "gemini-1.5-flash":
         genai.configure(api_key=get_api_key("GOOGLE_API_KEY"))
@@ -122,17 +149,21 @@ def extract_links(data, selected_model):
                 }
             }
         )
-        response_content = model.generate_content(f"{LINKS_MESSAGE}\n{USER_MESSAGE} {data}").candidates[0].content.parts[0].text
-
-        return response_content
+        response = model.generate_content(f"{LINKS_MESSAGE}\n{USER_MESSAGE} {json.dumps(links)}")
+        content = response.candidates[0].content.parts[0].text
+        return parse_response(content)
 
     elif selected_model == "Groq Llama3.1 70b":
         client = Groq(api_key=get_api_key("GROQ_API_KEY"))
-        response_content = client.chat.completions.create(
+        response = client.chat.completions.create(
             model=GROQ_LLAMA_MODEL_FULLNAME,
-            messages=[{"role": "system", "content": LINKS_MESSAGE}, {"role": "user", "content": user_prompt}]
-        ).choices[0].message.content
-        return response_content
+            messages=[
+                {"role": "system", "content": LINKS_MESSAGE},
+                {"role": "user", "content": user_prompt}
+            ]
+        )
+        content = response.choices[0].message.content
+        return parse_response(content)
 
     else:
         raise ValueError(f"Unsupported model: {selected_model}")
@@ -206,3 +237,21 @@ def evaluate(data):
     except Exception as e:
         print(f"Error: {e}")  # More detailed error logging
         raise ValueError("Error processing Gemini response")
+
+
+def scrape_multiple_data(urls: List[str]) :
+    """Scrape multiple URLs concurrently using headless Selenium."""
+    results = []
+
+    def scrape_url(url):
+        try:
+            html = fetch_html_selenium(url)
+            data = extract_data(html, url)
+            return {"url": url, "data": data}
+        except Exception as e:
+            return {"url": url, "error": str(e)}
+
+    for url in urls:
+        results.append(scrape_url(url))
+
+    return {"results": results}

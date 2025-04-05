@@ -120,16 +120,17 @@ USER_MESSAGE = f"Extract the following information from the provided text:\nPage
 
 LINKS_MESSAGE = """Tu es un expert en audit stratégique de sites web, spécialisé en SEO et marketing digital.
                     Je vais te fournir une liste de liens internes extraits d’un site web (liens relatifs ou absolus, avec ou sans paramètres).
-                    Ta mission est d’identifier maximum 10 liens parmi les plus pertinents pour un audit SEO et marketing.
+                    Ta mission est d’identifier au maximum 5 liens parmi les plus pertinents pour un audit SEO et marketing.
                     Concentre-toi exclusivement sur les pages suivantes :
 
-                    - Pages de services ou produits importantes
+                    - Pages de services ou produits
                     - Pages de contact
-                    - Pages de blog
+                    - Pages de blog, actualités ou ressources
 
-                    Priorise les pages ayant un impact direct sur la stratégie SEO et marketing, en particulier les pages de services clés.
+                    Priorise les pages ayant un impact direct sur la stratégie SEO et marketing, notamment les pages de services clés.
                     Ignore les liens non stratégiques (navigation, mentions légales, CGU, etc.).
-                    Retourne uniquement la liste des 10 liens les plus pertinents, sans explication et sans ordre particulier.
+                    Retourne uniquement la liste des 5 liens les plus pertinents, sans explication et sans ordre particulier.
+
                 """ 
 
 with open('./rules.json', 'r') as file:

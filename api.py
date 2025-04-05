@@ -27,7 +27,7 @@ from scraper import (
     extract_links,
     extract_data,
     evaluate,
-    setup_selenium,
+    extract_internal_links_from_html,
 )
 
 load_dotenv()
@@ -39,8 +39,7 @@ app = FastAPI()
 class ScrapeRequest(BaseModel):
     url: str
     selected_model: Optional[str]
-    fields: Optional[List[str]] = None
-    attended_mode: Optional[bool] = True
+
 class MultiScrapeRequest(BaseModel):
     urls: List[str]
 
@@ -96,12 +95,7 @@ def scrape_links(request: ScrapeRequest):
     try:
         url = request.url
         raw_html = fetch_html_selenium(url)
-        soup = BeautifulSoup(raw_html, "html.parser")
-
-        base_domain = urlparse(url).netloc
-        links = soup.find_all('a', href=True)
-        internal_links = {urljoin(url, a['href']) for a in links if urlparse(urljoin(url, a['href'])).netloc == base_domain}
-        internal_links = {urljoin(url, a['href']) for a in links if urlparse(urljoin(url, a['href'])).netloc == base_domain}
+        internal_links = extract_internal_links_from_html(raw_html, url)
     
         data = extract_links(internal_links, request.selected_model)
         
@@ -125,27 +119,35 @@ def scrape_data(request: ScrapeRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from scraper import fetch_html_selenium, extract_data
-
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from scraper import fetch_html_selenium, extract_data
-
 @app.post("/scrapeMultiple/")
 def scrape_multiple_data(request: MultiScrapeRequest):
     """Scrape multiple URLs concurrently using headless Selenium."""
-    results = []
-
     urls = request.urls
-    def scrape_url(url):
-        try:
-            html = fetch_html_selenium(url)
-            data = extract_data(html, url)
-            return {"url": url, "data": data}
-        except Exception as e:
-            return {"url": url, "error": str(e)}
 
-    for url in urls:
-        results.append(scrape_url(url))
+    return {"results": scrape_multiple_data(urls)}
 
-    return {"results": results}
+@app.post("/scrapeAllData/")
+def scrape_all_data(request: ScrapeRequest):
+    try:
+        results = []
+
+        url = request.url
+        raw_html = fetch_html_selenium(url)
+        base_data = extract_data(raw_html, url)
+        results.append({"url": url, "data": base_data})
+
+        internal_links = extract_internal_links_from_html(raw_html, url)
+        print(f"🔗 Extracted internal links: {len(internal_links)}")
+
+        # Filter relevant links using LLM
+        relevant_links = extract_links(list(internal_links), request.selected_model)
+        print(f"✅ Filtered relevant links: {len(relevant_links)}")
+
+        # Scrape them too
+        internal_results = scrape_multiple_data(relevant_links)
+        results.extend(internal_results["results"])
+
+        return {"results": results}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
