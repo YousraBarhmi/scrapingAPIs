@@ -41,11 +41,10 @@ class ScrapeRequest(BaseModel):
     selected_model: Optional[str]
     fields: Optional[List[str]] = None
     attended_mode: Optional[bool] = True
+class MultiScrapeRequest(BaseModel):
+    urls: List[str]
+
 # ---------------------- API Endpoints ----------------------
-@app.on_event("startup")
-def check_env():
-    import os
-    print("🚀 DOCKER ENV:", os.getenv("DOCKER"))
 
 @app.get("/")
 async def root():
@@ -125,3 +124,28 @@ def scrape_data(request: ScrapeRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from scraper import fetch_html_selenium, extract_data
+
+@app.post("/scrapeMultiple/")
+def scrape_multiple_data(request: MultiScrapeRequest):
+    """Scrape multiple URLs in parallel and return structured data for each."""
+    results = []
+    MAX_WORKERS = min(5, len(request.urls))
+
+    def scrape_url(url):
+        try:
+            html = fetch_html_selenium(url)
+            data = extract_data(html, url)
+            return {"url": url, "data": data}
+        except Exception as e:
+            return {"url": url, "error": str(e)}
+
+    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+        futures = {executor.submit(scrape_url, url): url for url in request.urls}
+
+        for future in as_completed(futures):
+            results.append(future.result())
+
+    return {"results": results}
