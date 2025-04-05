@@ -240,8 +240,7 @@ def evaluate(data):
         raise ValueError("Error processing Gemini response")
 
 
-def scrape_multiple_data(urls: List[str]) :
-    """Scrape multiple URLs concurrently using headless Selenium."""
+def run_bulk_scraper(urls: List[str]):
     results = []
 
     def scrape_url(url):

@@ -26,7 +26,7 @@ from scraper import (
     fetch_html_selenium,
     extract_links,
     extract_data,
-    evaluate,
+    run_bulk_scraper,
     extract_internal_links_from_html,
 )
 
@@ -122,7 +122,7 @@ def scrape_data(request: ScrapeRequest):
 @app.post("/scrapeMultiple/")
 def scrape_multiple_data(request: MultiScrapeRequest):  
     urls = request.urls
-    return {"results": scrape_multiple_data(urls)}  
+    return run_bulk_scraper(urls)
 
 @app.post("/scrapeAllData/")
 def scrape_all_data(request: ScrapeRequest):
@@ -137,12 +137,10 @@ def scrape_all_data(request: ScrapeRequest):
         internal_links = extract_internal_links_from_html(raw_html, url)
         print(f"🔗 Extracted internal links: {len(internal_links)}")
 
-        # Filter relevant links using LLM
         relevant_links = extract_links(list(internal_links), request.selected_model)
         print(f"✅ Filtered relevant links: {len(relevant_links)}")
 
-        # Scrape them too
-        internal_results = scrape_multiple_data(relevant_links)
+        internal_results = run_bulk_scraper(relevant_links)
         results.extend(internal_results["results"])
 
         return {"results": results}
