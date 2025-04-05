@@ -99,7 +99,7 @@ def scrape_links(request: ScrapeRequest):
     
         data = extract_links(internal_links, request.selected_model)
         
-        return data
+        return  {"urls": data }
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
