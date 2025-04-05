@@ -123,9 +123,9 @@ LINKS_MESSAGE = """Tu es un expert en audit stratégique de sites web, spéciali
                     Ta mission est d’identifier maximum 10 liens parmi les plus pertinents pour un audit SEO et marketing.
                     Concentre-toi exclusivement sur les pages suivantes :
 
-                    - Pages de services ou produits
+                    - Pages de services ou produits importantes
                     - Pages de contact
-                    - Pages de blog, actualités ou ressources
+                    - Pages de blog
 
                     Priorise les pages ayant un impact direct sur la stratégie SEO et marketing, en particulier les pages de services clés.
                     Ignore les liens non stratégiques (navigation, mentions légales, CGU, etc.).

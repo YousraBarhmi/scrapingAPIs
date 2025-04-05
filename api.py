@@ -136,8 +136,7 @@ def scrape_multiple_data(request: MultiScrapeRequest):
     """Scrape multiple URLs concurrently using headless Selenium."""
     results = []
 
-    MAX_WORKERS = min(2, len(request.urls)) 
-
+    urls = request.urls
     def scrape_url(url):
         try:
             html = fetch_html_selenium(url)
@@ -146,13 +145,7 @@ def scrape_multiple_data(request: MultiScrapeRequest):
         except Exception as e:
             return {"url": url, "error": str(e)}
 
-    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-        future_to_url = {
-            executor.submit(scrape_url, url): url for url in request.urls
-        }
-
-        for future in as_completed(future_to_url):
-            result = future.result()
-            results.append(result)
+    for url in urls:
+        results.append(scrape_url(url))
 
     return {"results": results}
