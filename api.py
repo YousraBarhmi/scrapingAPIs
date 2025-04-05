@@ -120,11 +120,9 @@ def scrape_data(request: ScrapeRequest):
 
 
 @app.post("/scrapeMultiple/")
-def scrape_multiple_data(request: MultiScrapeRequest):
-    """Scrape multiple URLs concurrently using headless Selenium."""
+def scrape_multiple_data(request: MultiScrapeRequest):  
     urls = request.urls
-
-    return {"results": scrape_multiple_data(urls)}
+    return {"results": scrape_multiple_data(urls)}  
 
 @app.post("/scrapeAllData/")
 def scrape_all_data(request: ScrapeRequest):

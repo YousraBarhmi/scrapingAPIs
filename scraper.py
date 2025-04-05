@@ -110,7 +110,8 @@ def extract_internal_links_from_html(raw_html, url):
         and urljoin(url, a['href']).rstrip('/') != normalized_url
     }
 
-    return internal_links
+    return list(internal_links)
+
 
 def extract_links(links: List[str], selected_model: str) -> List[str]:
     user_prompt = f"{USER_MESSAGE} {json.dumps(links, ensure_ascii=False)}"
@@ -206,8 +207,8 @@ def extract_data(html_content, url):
         "title": title,
         "description": description,
         "headings": headings,
-        "internal_links": internal_links,
-        "external_links": external_links,
+        "internal_links": list(internal_links),
+        "external_links": list(external_links),
         "images": images,
         "structured_data": structured_data,
         "word_count": word_count,
